@@ -4,7 +4,7 @@ Version: 1.1
 Release: 4
 License: GNU GPL
 Group: Applications/System
-Source0: %{name}-%{version}.tar
+Source0: %{name}-%{version}.tar.bz2
 BuildArch: noarch
 
 BuildRoot: %{_tmppath}/%{name}

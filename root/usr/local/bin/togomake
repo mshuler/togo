@@ -1,24 +1,24 @@
 #!/usr/bin/perl
 
-$tar = 1;
-$gzip = 0;
-$bzip = 0;
+#$tar = 1;
+#$gzip = 0;
+#$bzip = 0;
 $continue = 1;
 
-# Process the parameters
-foreach $arg (@ARGV) {
-	if ( $arg eq "-t" ) {
-		$tar = 1;
-	} elsif ( $arg eq "-g" ) {
-		$gzip = 1;
-		$tar = 0;
-	} elsif ( $arg eq "-b" ) {
-		$bzip = 1;
-		$tar = 0;
-	} else {
-		$continue = 0;
-	}
-}
+## Process the parameters
+#foreach $arg (@ARGV) {
+#	if ( $arg eq "-t" ) {
+#		$tar = 1;
+#	} elsif ( $arg eq "-g" ) {
+#		$gzip = 1;
+#		$tar = 0;
+#	} elsif ( $arg eq "-b" ) {
+#		$bzip = 1;
+#		$tar = 0;
+#	} else {
+#		$continue = 0;
+#	}
+#}
 
 if ($continue == 1) {
 
@@ -80,6 +80,10 @@ sub collectVars {
 	$version = `egrep ^Version: $spec_file`;
 	$version =~ s/Version:[\s]*//;
 	$version =~ s/\n.*//;
+	$source = `egrep ^Source0: $spec_file`;
+	$source =~ s/Source0:[\s]*//;
+	$source =~ s/\n.*//;
+	$source =~ s/\%\{.*\}\.tar//;
 	$project_name = $name."-".$version;
 	$tar_name = $project_name.".tar";
 	$gz_tar_name = $project_name.".tar.gz";
@@ -128,22 +132,20 @@ sub copySources {
 sub tarSource {
 	print " Tarring source into approriate areas...\n";
 
-	$exclude_string = "--exclude .svn* --exclude *.spec --exclude rpmbuild --exclude usr/src/rpmbuild --exclude *.source";
 	$exclude_string = '--exclude *.source';
 
-	if ($tar) {
+	if ($source == '') {
 	print "   rpmbuild/SOURCES/$tar_name...\n";
 	`tar -cf rpmbuild/SOURCES/$tar_name root/ $exclude_string`;
 	}
-	if ($gzip) {
+	if ($source == '.gz') {
 	print "   rpmbuild/SOURCES/$gz_tar_name...\n";
 	`tar -zchf rpmbuild/SOURCES/$gz_tar_name root/ $exclude_string`;
 	}
-	if ($bzip) {
+	if ($source == '.bz2') {
 	print "   rpmbuild/SOURCES/$bz_tar_name...\n";
 	`tar -jchf rpmbuild/SOURCES/$bz_tar_name root/. $exclude_string`;
 	}
-#	`rm -rf $project_name`;
 	print "\n";
 }
 
