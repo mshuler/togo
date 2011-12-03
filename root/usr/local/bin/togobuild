@@ -1,0 +1,29 @@
+#!/bin/bash
+
+echo
+echo "===================="
+echo "BUILDING THE RPM...."
+echo "===================="
+echo
+
+time rpmbuild -bb *.spec
+
+echo
+echo "===================="
+echo "QUERYING PACKAGE...."
+echo "===================="
+echo
+
+# Determine build architecture from the spec file and test the rpm under that directory
+build_arch=`grep BuildArch: *.spec | sed -e 's/\s//g' | sed -e 's/BuildArch://g'`
+
+if [[ `rpm -qlp rpmbuild/RPMS/$build_arch/*.rpm | wc -l` -gt 1 ]]
+then
+	echo "Done!"
+	echo ""
+else
+	echo "WARNING: RPM doesn't contain any files!"
+	echo "Done!"
+fi
+echo ""
+

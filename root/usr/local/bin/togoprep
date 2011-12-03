@@ -1,0 +1,67 @@
+#!/bin/bash
+
+########################################
+# Copies a generic spec file to the
+# current directory according to PARAM1
+########################################
+
+template_dir="/usr/local/share/doc/togo"
+
+# Check for existence of parameter passed to script
+if [[ ! $1 ]]
+then
+
+	echo ""
+	echo "This script generates a generic spec file and man page.."
+	echo "  Usage: togoprep <packageName>";
+	echo
+else
+
+echo ""
+echo "=================================="
+echo " Creating directory..."
+if [[ ! -e $1 ]]
+then
+	mkdir -p $1
+else
+	echo "ERROR: Directory already exists!"
+	echo ""
+	exit
+fi
+echo " Creating the generic spec file..."
+# Copy the generic spec file to PARAM1.spec
+if [[ ! -e $1/$1.spec ]]
+then
+	cp $template_dir/togo-spec.spec $1/$1.spec;
+else
+	echo "  - $1/$1.spec already exists.";
+fi
+# Change the PARAM1.spec file to the correctly named package
+perl -pi -e 's/Name:.*/Name: '$1'/' $1/$1.spec
+echo "   Done!"
+echo
+
+echo " Creating generic man page..."
+if [[ ! -e $1/$1.1 ]]
+then
+	MAN_DIR="root/usr/local/share/man/man1"
+	MAN_DEST="$MAN_DIR/$1.1"
+	mkdir -p $1/$MAN_DIR
+	cp $template_dir/togo-man.1 $1/$MAN_DEST;
+        
+        echo "  Linking man page to root..."
+	ln -s $MAN_DEST $1/man_page
+else
+	echo "  - $MAN_DEST already exists.";
+fi
+echo "   Done!"
+
+
+echo "=================================="
+echo
+echo " Alter the spec file and man page"
+echo " to your needs, then run "
+echo " togomake"
+echo
+
+fi

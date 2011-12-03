@@ -1,0 +1,156 @@
+#!/usr/bin/perl
+
+$tar = 1;
+$gzip = 0;
+$bzip = 0;
+$continue = 1;
+
+# Process the parameters
+foreach $arg (@ARGV) {
+	if ( $arg eq "-t" ) {
+		$tar = 1;
+	} elsif ( $arg eq "-g" ) {
+		$gzip = 1;
+		$tar = 0;
+	} elsif ( $arg eq "-b" ) {
+		$bzip = 1;
+		$tar = 0;
+	} else {
+		$continue = 0;
+	}
+}
+
+if ($continue == 1) {
+
+# Clean the directories before build and move any sources back into the pwd
+&cleanDirs;
+
+# Collect variable information
+if (&collectVars == 1) {
+	# Set up directory structure
+	&makeDirStructure;
+
+	# Set up user variables
+	&setUserVars;
+
+        # Move the source files into the buildtree
+        &copySources;
+
+	# Tar up the source
+	&tarSource;
+
+} else {
+	print "   Couln't find a spec file or found more than one!\n";
+	print "  Exiting...\n";
+}
+
+} else {
+	print "  Syntax\n";
+	print "    -h, --help   This help screen\n";
+	print "    -t           Creates tar archive (created by default)\n";
+	print "    -g           Creates gzipped archive\n";
+	print "    -b           Creates bzipped archive\n";
+}
+
+
+sub cleanDirs {
+	print "\n";
+	print " Removing old files...\n";
+	`rm -rf rpmbuild 2>/dev/null`;
+	print "   Removed rpmbuild directories\n";
+	return;
+}
+
+
+sub collectVars {
+	print " Collecting variable information..."."\n";
+	$num_specs = `ls *.spec | wc -l 2>/dev/null`;
+	$num_specs =~ s/\n//;
+	if ($num_specs > 1) {
+		return 0;
+	}
+	$spec_file = `ls *.spec 2>/dev/null`;
+	if (length $spec_file < 3) {
+		return 0;
+	}
+	$spec_file =~ s/\n//;
+	$name = `egrep ^Name: $spec_file`;
+	$name =~ s/Name:[\s]*//;
+	$name =~ s/\n.*//;
+	$version = `egrep ^Version: $spec_file`;
+	$version =~ s/Version:[\s]*//;
+	$version =~ s/\n.*//;
+	$project_name = $name."-".$version;
+	$tar_name = $project_name.".tar";
+	$gz_tar_name = $project_name.".tar.gz";
+	$bz_tar_name = $project_name.".tar.bz2";
+	$home_build = `pwd`;
+	$home_build =~ s/\n//;
+
+	print "   Spec File: ".$spec_file."\n";
+	print "   Name: ".$name."\n";
+	print "   Version: ".$version."\n";
+	print "   Work Dir: ".$home_build."\n";
+	print "   Project Name: ".$project_name."\n";
+	return 1;
+}
+
+sub makeDirStructure {
+	print " Creating directory structure...\n";
+
+	@dirs = ("BUILD", "RPMS", "SOURCES", "SPECS", "SRPMS");
+
+	for $dir_name (@dirs) {
+		print "   Creating dir 'rpmbuild/$dir_name`\n";
+		`mkdir -p rpmbuild/$dir_name`;
+	}
+	print "   Linking spec file\n";
+	`ln -s ../../$spec_file rpmbuild/SPECS/$spec_file`;
+	return
+}
+
+sub setUserVars {
+	print " Setting up environment variables...\n";
+	print "   Setting '%_topdir' macro\n";
+	`echo "%_topdir        $home_build/rpmbuild" > ~/.rpmmacros`;
+	print "   Setting gpg key macros\n";
+	`echo "%_signature     gpg" >> ~/.rpmmacros`;
+	`echo "%_gpg_path      /root/.gnupg" >> ~/.rpmmacros`;
+	`echo "%_gpg_name      \`whoami\`@\`hostname\`" >> ~/.rpmmacros`;
+	`echo "%_gpgbin        /usr/bin/gpg" >> ~/.rpmmacros`;
+}
+
+sub copySources {
+        print " Copying sources into buildtree...\n";
+        `cp *.source rpmbuild/SOURCES 2>/dev/null`;
+}
+
+sub tarSource {
+	print " Tarring source into approriate areas...\n";
+
+	$exclude_string = "--exclude .svn* --exclude *.spec --exclude rpmbuild --exclude usr/src/rpmbuild --exclude *.source";
+	$exclude_string = '--exclude *.source';
+
+	if ($tar) {
+	print "   rpmbuild/SOURCES/$tar_name...\n";
+	`tar -cf rpmbuild/SOURCES/$tar_name root/ $exclude_string`;
+	}
+	if ($gzip) {
+	print "   rpmbuild/SOURCES/$gz_tar_name...\n";
+	`tar -zchf rpmbuild/SOURCES/$gz_tar_name root/ $exclude_string`;
+	}
+	if ($bzip) {
+	print "   rpmbuild/SOURCES/$bz_tar_name...\n";
+	`tar -jchf rpmbuild/SOURCES/$bz_tar_name root/. $exclude_string`;
+	}
+#	`rm -rf $project_name`;
+	print "\n";
+}
+
+
+
+
+
+
+
+

@@ -1,0 +1,33 @@
+.TH TOGO 1 "12/2/11" Linux "TOGO Reference"
+.SH NAME
+togo \- Series of scripts to assist with the setup and creation of RPMs
+.SH FILES
+.B togoprep
+| 
+.B togomake
+| 
+.B togobuild
+.SH FILE DESCRIPTION
+.IP "togoprep <desired_rpm_name>
+Preps the build environment and copies a generic man page and spec file into the current working directory.
+.IP "togomake"
+Creates the build directory structure and tars up the source.
+.IP "togobuild"
+Attempts to build and query the subsequently created package for its contents.
+.SH EXAMPLE USAGE
+Here is an example build of a package called "foobar":
+.IP "togoprep foobar"
+Run this command to get started. It will create a new folder, in your current directory, called "foobar". In this folder will be a generic "foobar.1" man page, a generic "foobar.spec" file, and a "root" folder. Simply place your files in the desired directory structure under the "root" folder, update the spec file (package name, version, auther, etc.) and man page with the details of your project, then proceed to the next step.
+
+If you understand what the spec file does, feel free to modify it to its full potential.
+.IP "togomake"
+Run this script from the root directory of your togo project. It will tar up your sources and make the directory structure required to build the RPM. Once complete, proceed to the final step.
+.IP "togobuild"
+Run this script from the root directory of your togo project. It will attempt to build an RPM from the spec file you have altered and the sources you have provided. It will then query the package for it's contents to ensure there are actually files in the RPM.
+
+Once complete, you will find your RPM(s) within the rpmbuild/RPMS/{ARCH} folders.
+.sh PATCHES
+If the package has patches which need to be applied, please them in the root source directory (the same directory you run togomake/build in). The togomake script will move them to the appropriate area when the script is run.
+
+.SH AUTHOR
+Xirsix - Gene Reese <gene.reese@xirsix.com>

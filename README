@@ -1,0 +1,215 @@
+################################################################################################
+#
+# TOGO How-To-Build Help File
+#
+################################################################################################
+
+First, ensure you have the required files to build the RPM:
+
+For most Red Hat installations, you'll only need:
+  yum install rpm-build perl
+
+Or, if you're lazy, you can go ahead and grab all the devel tools:
+  yum install "@Development Tools"
+
+################################################################################################
+
+To build togo, leave everything where it was checked out to and then 'CD'
+into the root directory where you can see 'togo.spec', then run:
+
+  ./build-togo.sh
+
+If all went well, the new RPM should be under your present working directory.
+
+Install the RPM:
+  yum localinstall togo*.rpm
+
+Check the man page for more details:
+  man togo
+
+
+
+####################################################################################
+# Example project build
+####################################################################################
+
+#-----------------------------------------------------------------------------------
+# Create a togo project directory
+#-----------------------------------------------------------------------------------
+
+[greese@devel Desktop]$ mkdir togo_projects
+[greese@devel Desktop]$ cd togo_projects/
+[greese@devel togo_projects]$
+
+#-----------------------------------------------------------------------------------
+# Create the project
+#-----------------------------------------------------------------------------------
+
+[greese@devel togo_projects]$ togoprep foo
+
+==================================
+ Creating directory...
+ Creating the generic spec file...
+   Done!
+
+ Creating generic man page...
+  Linking man page to root...
+   Done!
+==================================
+
+ Alter the spec file and man page
+ to your needs, then run 
+ togomake
+
+[greese@devel togo_projects]$ cd foo/
+[greese@devel foo]$
+
+
+#-----------------------------------------------------------------------------------
+# Create some nonsense files as a test
+#-----------------------------------------------------------------------------------
+
+[greese@devel foo]$ mkdir -p root/usr/local
+[greese@devel foo]$ touch root/usr/local/a_test.file
+
+
+#-----------------------------------------------------------------------------------
+# Run togomake to tar up everything
+#-----------------------------------------------------------------------------------
+
+[greese@devel foo]$ togomake 
+
+ Removing old files...
+   Removed rpmbuild directories
+ Collecting variable information...
+   Spec File: foo.spec
+   Name: foo
+   Version: 1.0
+   Work Dir: /home/greese/Desktop/togo_projects/foo
+   Project Name: foo-1.0
+ Creating directory structure...
+   Creating dir 'rpmbuild/BUILD`
+   Creating dir 'rpmbuild/RPMS`
+   Creating dir 'rpmbuild/SOURCES`
+   Creating dir 'rpmbuild/SPECS`
+   Creating dir 'rpmbuild/SRPMS`
+   Linking spec file
+ Setting up environment variables...
+   Setting '%_topdir' macro
+   Setting gpg key macros
+ Copying sources into buildtree...
+ Tarring source into approriate areas...
+   rpmbuild/SOURCES/foo-1.0.tar...
+
+
+#-----------------------------------------------------------------------------------
+# Run togobuild to build the RPM
+#-----------------------------------------------------------------------------------
+
+[greese@devel foo]$ togobuild 
+
+====================
+BUILDING THE RPM....
+====================
+
+Executing(%prep): /bin/sh -e /var/tmp/rpm-tmp.OVlsgn
++ umask 022
++ cd /home/greese/Desktop/togo_projects/foo/rpmbuild/BUILD
++ LANG=C
++ export LANG
++ unset DISPLAY
++ rm -rf /home/greese/Desktop/togo_projects/foo/rpmbuild/BUILDROOT/foo-1.0-1.x86_64
++ cd /home/greese/Desktop/togo_projects/foo/rpmbuild/BUILD
++ rm -rf foo-1.0
++ /bin/mkdir -p foo-1.0
++ cd foo-1.0
++ /bin/tar -xf /home/greese/Desktop/togo_projects/foo/rpmbuild/SOURCES/foo-1.0.tar
++ /bin/tar -xf /home/greese/Desktop/togo_projects/foo/rpmbuild/SOURCES/foo-1.0.tar
++ /bin/chmod -Rf a+rX,u+w,g-w,o-w .
++ exit 0
+Executing(%build): /bin/sh -e /var/tmp/rpm-tmp.eq17gp
++ umask 022
++ cd /home/greese/Desktop/togo_projects/foo/rpmbuild/BUILD
++ cd foo-1.0
++ LANG=C
++ export LANG
++ unset DISPLAY
++ exit 0
+Executing(%install): /bin/sh -e /var/tmp/rpm-tmp.Cl28ir
++ umask 022
++ cd /home/greese/Desktop/togo_projects/foo/rpmbuild/BUILD
++ '[' /home/greese/Desktop/togo_projects/foo/rpmbuild/BUILDROOT/foo-1.0-1.x86_64 '!=' / ']'
++ rm -rf /home/greese/Desktop/togo_projects/foo/rpmbuild/BUILDROOT/foo-1.0-1.x86_64
+++ dirname /home/greese/Desktop/togo_projects/foo/rpmbuild/BUILDROOT/foo-1.0-1.x86_64
++ mkdir -p /home/greese/Desktop/togo_projects/foo/rpmbuild/BUILDROOT
++ mkdir /home/greese/Desktop/togo_projects/foo/rpmbuild/BUILDROOT/foo-1.0-1.x86_64
++ cd foo-1.0
++ LANG=C
++ export LANG
++ unset DISPLAY
++ cp -R root/usr /home/greese/Desktop/togo_projects/foo/rpmbuild/BUILDROOT/foo-1.0-1.x86_64
++ /usr/lib/rpm/check-buildroot
++ /usr/lib/rpm/redhat/brp-compress
++ /usr/lib/rpm/redhat/brp-strip /usr/bin/strip
++ /usr/lib/rpm/redhat/brp-strip-comment-note /usr/bin/strip /usr/bin/objdump
++ /usr/lib/rpm/redhat/brp-strip-static-archive /usr/bin/strip
++ /usr/lib/rpm/brp-python-bytecompile /usr/bin/python 1
++ /usr/lib/rpm/redhat/brp-python-hardlink
++ /usr/lib/rpm/redhat/brp-java-repack-jars
+Processing files: foo-1.0-1.noarch
+Requires(interp): /bin/sh /bin/sh /bin/sh /bin/sh
+Requires(rpmlib): rpmlib(CompressedFileNames) <= 3.0.4-1 rpmlib(FileDigests) <= 4.6.0-1 rpmlib(PayloadFilesHavePrefix) <= 4.0-1
+Requires(pre): /bin/sh
+Requires(post): /bin/sh
+Requires(preun): /bin/sh
+Requires(postun): /bin/sh
+Checking for unpackaged file(s): /usr/lib/rpm/check-files /home/greese/Desktop/togo_projects/foo/rpmbuild/BUILDROOT/foo-1.0-1.x86_64
+Wrote: /home/greese/Desktop/togo_projects/foo/rpmbuild/RPMS/noarch/foo-1.0-1.noarch.rpm
+Executing(%clean): /bin/sh -e /var/tmp/rpm-tmp.PfN5Lw
++ umask 022
++ cd /home/greese/Desktop/togo_projects/foo/rpmbuild/BUILD
++ cd foo-1.0
++ rm -fr /home/greese/Desktop/togo_projects/foo/rpmbuild/BUILDROOT/foo-1.0-1.x86_64
++ exit 0
+
+real  0m0.331s
+user	0m0.149s
+sys	0m0.184s
+
+====================
+QUERYING PACKAGE....
+====================
+
+Done!
+
+#-----------------------------------------------------------------------------------
+# Verify the contents of the RPM
+#-----------------------------------------------------------------------------------
+
+[greese@devel foo]$ rpm -qip rpmbuild/RPMS/noarch/foo-1.0-1.noarch.rpm 
+Name        : foo
+Version     : 1.0
+Release     : 1
+Architecture: noarch
+Install Date: (not installed)
+Group       : Applications
+Size        : 418
+License     : GNU GPL
+Signature   : (none)
+Source RPM  : foo-1.0-1.src.rpm
+Build Date  : Fri 02 Dec 2011 10:01:15 PM CST
+Build Host  : localhost
+Relocations : (not relocatable)
+Summary     : This is an example summary
+Description :
+This is a an example description.
+
+[greese@devel foo]$ rpm -qlp rpmbuild/RPMS/noarch/foo-1.0-1.noarch.rpm 
+/usr
+/usr/local
+/usr/local/a_test.file
+/usr/local/share
+/usr/local/share/man
+/usr/local/share/man/man1
+/usr/local/share/man/man1/foo.1
+
